@@ -22,9 +22,10 @@ variable "tags" {
 variable "nsg_rules" {
   type = list(object({
     name                         = string
+    description                  = string
     priority                     = number
     direction                    = string
-    access                       = string
+    access                       = optional(string, "Allow")
     protocol                     = string
     source_port_ranges           = list(string)
     destination_port_ranges      = list(string)

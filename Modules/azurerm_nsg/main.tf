@@ -15,6 +15,7 @@ resource "azurerm_network_security_group" "network_security_group" {
 resource "azurerm_network_security_rule" "nsg_rules" {
   for_each                     = { for nsg_rule in toset(var.nsg_rules) : nsg_rule.name => nsg_rule }
   name                         = each.key
+  description                  = each.value.description
   priority                     = each.value.priority
   direction                    = each.value.direction
   access                       = each.value.access
