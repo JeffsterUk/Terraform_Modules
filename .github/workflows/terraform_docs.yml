@@ -21,3 +21,4 @@ jobs:
         git-push: "true"
         config-file: "Terraform Docs/.terraform-docs.yml"
         recursive: true
+        recursive-path: Modules
