@@ -16,8 +16,9 @@ jobs:
     - name: Render terraform docs and push changes back to PR
       uses: terraform-docs/gh-actions@main
       with:
-        working-dir: ./Modules/azure_private_endpoint
+        working-dir: ./Modules
         output-file: README.md
         output-method: inject
         git-push: "true"
-        config-file: ../Modules/terraform_docs/.terraform-docs.yml
+        config-file: terraform_docs/.terraform-docs.yml
+        recursive: true
