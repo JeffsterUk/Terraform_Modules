@@ -8,18 +8,6 @@ variable "resource_group_name" {
   description = "The name of the Resource Group where the resources will be created."
 }
 
-variable "soa_record" {
-  type = object({
-    email        = string
-    expire_time  = number
-    minimum_ttl  = number
-    refresh_time = number
-    retry_time   = number
-    ttl          = number
-  })
-  default = null
-}
-
 variable "virtual_network_links" {
   type = list(object({
     name               = string
