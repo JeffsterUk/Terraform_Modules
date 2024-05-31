@@ -11,12 +11,12 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
-    - run: ls
+    - run: ls -l
   
-    # - name: Render terraform docs and push changes back to PR
-    #   uses: terraform-docs/gh-actions@main
-    #   with:
-    #     working-dir: .
-    #     output-file: README.md
-    #     output-method: inject
-    #     git-push: "true"
+    - name: Render terraform docs and push changes back to PR
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: ./Modules/azure_private_endpoint
+        output-file: README.md
+        output-method: inject
+        git-push: "true"
