@@ -59,33 +59,9 @@ variable "min_tls_version" {
   description = "The minimum supported TLS version for the Storage Account. Possible values are TLS1_0, TLS1_1, and TLS1_2."
 }
 
-variable "tags" {
-  type        = map(string)
-  description = "A mapping of tags to assign to the resource."
-  default     = {}
-}
-
-variable "private_endpoints" {
-  type = list(object({
-    name                                 = string
-    private_service_connection_name      = string
-    subnet_id                            = string
-    subresource_names                    = list(string)
-    private_dns_zone_name                = string
-    private_dns_zone_resource_group_name = string
-    is_manual_connection                 = bool
-  }))
-  description = <<-EOT
-  A private_endpoints block supports the following:
-  &bull; `name` = string - The name of the Private Endpoint
-  &bull; `private_service_connection_name` = string - The name of the Private Service Connection.
-  &bull; `subnet_id` = string - The Subnet ID where this Network Interface should be located in.
-  &bull; `subresource_names` = string - A list of subresource names which the Private Endpoint is able to connect to. subresource_names corresponds to group_id.
-  &bull; `private_dns_zone_name` = string - Private DNS Zone Name
-  &bull; `private_dns_zone_resource_group_name` = string - Private DNS Zone Resource Group Name
-  &bull; `is_manual_connection` = bool - Boolean flag to specify whether the Private Endpoint requires manual approval from the remote resource owner.
-  EOT
-  default     = []
+variable "allow_nested_items_to_be_public" {
+  type    = bool
+  default = true
 }
 
 variable "public_network_access_enabled" {
@@ -94,27 +70,27 @@ variable "public_network_access_enabled" {
   default     = true
 }
 
-variable "allow_nested_items_to_be_public" {
-  type    = bool
-  default = true
-}
-
-variable "queue_properties_logging" {
-  type = object({
-    delete                = bool
-    read                  = bool
-    write                 = bool
-    version               = string
-    retention_policy_days = number
-  })
-  default = null
-}
-
 variable "network_rules" {
   type = object({
     default_action = string
   })
   default = null
+}
+
+variable "private_endpoints" {
+  type = list(object({
+    name                                 = string
+    subnet_id                            = string
+    private_service_connection = object({
+      name              = string
+      subresource_names = list(string)
+    })
+    private_dns_zone_group = object({
+      name = string
+      private_dns_zone_ids = list(string)
+    })
+  }))
+  default     = []
 }
 
 variable "storage_shares" {
@@ -126,14 +102,19 @@ variable "storage_shares" {
   description = "A list of Storage Shares to be created in the Storage Account."
 }
 
-variable "enable_diagnostic_settings" {
-  type        = bool
-  description = "Enable Diagnostic Settings."
-  default     = false
+variable "diagnostic_settings" {
+  type = object({
+    name = string
+    log_analytics_workspace_id = string
+  })
+  default = {
+    name = null
+    log_analytics_workspace_id = null
+  }
 }
 
-variable "log_analytics_workspace_id" {
-  type        = string
-  description = "The ID of the Log Analytics Workspace to send Diagnostic to."
-  default     = null
+variable "tags" {
+  type        = map(string)
+  description = "A mapping of tags to assign to the resource."
+  default     = {}
 }
