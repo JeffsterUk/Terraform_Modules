@@ -26,18 +26,6 @@ content: |-
 
   ## Example
 
-  ```hcl
-  {{ include "examples/locals.tf" }}
-  ```
-
-  ```hcl
-  {{ include "examples/variables.tf" }}
-  ```
-
-  ```hcl
-  {{ include "examples/example.tf" }}
-  ```
-
 output:
   file: ""
   mode: inject
