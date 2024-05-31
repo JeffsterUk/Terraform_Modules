@@ -34,12 +34,12 @@ module "private_endpoints" {
   source    = "../azure_private_endpoint"
   for_each  = { for private_endpoint in var.private_endpoints : private_endpoint.name => private_endpoint }
 
-  name                                 = each.value.name
-  location                             = var.location
-  resource_group_name                  = var.resource_group_name
-  subnet_id                            = each.value.subnet_id
+  name                = each.value.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = each.value.subnet_id
 
-  private_service_connection           = {
+  private_service_connection = {
     name                           = each.value.private_service_connection.name
     private_connection_resource_id = azurerm_storage_account.this.id
     subresource_names              = each.value.private_service_connection.subresource_names
@@ -55,7 +55,7 @@ module "private_endpoints" {
     log_analytics_workspace_id = var.diagnostic_settings.log_analytics_workspace_id
   }
 
-  tags                                 = var.tags
+  tags = var.tags
 }
 
 resource "azurerm_storage_share" "this" {

@@ -21,23 +21,23 @@ variable "subnet_id" {
 
 variable "private_service_connection" {
   type = object({
-    name = string
+    name                           = string
     private_connection_resource_id = string
-    is_manual_connection = optional(string, false)
-    subresource_names = list(string)
+    is_manual_connection           = optional(string, false)
+    subresource_names              = list(string)
   })
 }
 
 variable "private_dns_zone_group" {
   type = object({
-    name = string
+    name                 = string
     private_dns_zone_ids = list(string)
-  }) 
+  })
 }
 
 variable "diagnostic_settings" {
   type = object({
-    name = string
+    name                       = string
     log_analytics_workspace_id = string
   })
   default = null

@@ -79,18 +79,18 @@ variable "network_rules" {
 
 variable "private_endpoints" {
   type = list(object({
-    name                                 = string
-    subnet_id                            = string
+    name      = string
+    subnet_id = string
     private_service_connection = object({
       name              = string
       subresource_names = list(string)
     })
     private_dns_zone_group = object({
-      name = string
+      name                 = string
       private_dns_zone_ids = list(string)
     })
   }))
-  default     = []
+  default = []
 }
 
 variable "storage_shares" {
@@ -104,11 +104,11 @@ variable "storage_shares" {
 
 variable "diagnostic_settings" {
   type = object({
-    name = string
+    name                       = string
     log_analytics_workspace_id = string
   })
   default = {
-    name = null
+    name                       = null
     log_analytics_workspace_id = null
   }
 }
