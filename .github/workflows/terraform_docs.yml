@@ -11,23 +11,7 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
-    - name: List subfolders
-      id: list-subfolders
-      uses: Drafteame/list-folders-action@main
-      with:
-        paths: .
-
-    - name: Output total sub-folders
-      run: echo "Total sub-folders: ${{ steps.list-subfolders.outputs.total }}"
-
-    - name: Output folders with base path
-      run: echo "Folders with base path: ${{ steps.list-subfolders.outputs.folders }}"
-
-    - name: Output folders without base path
-      run: echo "Folders without base path: ${{ steps.list-subfolders.outputs.folders_no_base_path }}"
-
-    - name: Output folders by path
-      run: echo "Folders by path: ${{ steps.list-subfolders.outputs.folders_by_path }}"
+    - run: ls
   
     # - name: Render terraform docs and push changes back to PR
     #   uses: terraform-docs/gh-actions@main
