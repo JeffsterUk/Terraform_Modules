@@ -11,6 +11,11 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
+    - name: list-folders-action
+      uses: Drafteame/list-folders-action@v0.1.0
+      with:
+          paths: .
+  
     # - name: Render terraform docs and push changes back to PR
     #   uses: terraform-docs/gh-actions@main
     #   with:
