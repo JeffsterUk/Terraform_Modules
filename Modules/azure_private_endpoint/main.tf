@@ -20,10 +20,10 @@ resource "azurerm_private_endpoint" "this" {
   }
 
   dynamic "private_dns_zone_group" {
-    for_each = var.private_dns_zone_group != "" ? [1] : []
+    for_each = var.private_dns_zone_group != "" ? [ var.private_dns_zone_group ] : []
     content {
-      name                 = var.private_dns_zone_group.name
-      private_dns_zone_ids = var.private_dns_zone_group.private_dns_zone_ids
+      name                 = private_dns_zone_group.value["name"]
+      private_dns_zone_ids = private_dns_zone_group.value["private_dns_zone_ids"]
     }
   }
 }

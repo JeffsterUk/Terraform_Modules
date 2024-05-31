@@ -1,16 +1,16 @@
-output "private_endpoint_name" {
+output "name" {
   value       = azurerm_private_endpoint.this.name
-  description = "The name of the Private Endpoint."
+  description = "The Name of the Private Endpoint."
 }
 
-output "private_endpoint_id" {
+output "id" {
   value       = azurerm_private_endpoint.this.id
   description = "The ID of the Private Endpoint."
 }
 
-output "private_ip" {
+output "private_ip_address" {
   value       = azurerm_private_endpoint.this.private_service_connection[0].private_ip_address
-  description = "The Private IP Address associated with the Private Endpoint."
+  description = "The Private IP Address of the Private Endpoint."
 }
 
 output "custom_dns_configs" {
