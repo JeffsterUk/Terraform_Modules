@@ -17,6 +17,9 @@ resource "azurerm_role_assignment" "this" {
   scope                = each.value.scope_id
   role_definition_name = each.value.role_definition_name
   principal_id         = azurerm_user_assigned_identity.this.principal_id
+  lifecycle {
+    ignore_changes = [ scope ]
+  }
 }
 
 resource "azurerm_federated_identity_credential" "this" {
