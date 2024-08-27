@@ -53,7 +53,7 @@ variable "diagnostic_settings" {
     name                       = string
     log_analytics_workspace_id = string
   })
-  default = null
+  default     = null
   description = <<-EOT
       The diagnostic settings block supports the following arguments:
 

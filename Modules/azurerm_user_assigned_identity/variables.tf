@@ -28,13 +28,13 @@ variable "role_assignments" {
   default = {}
 }
 
-  variable "federated_identity_credentials" {
-    description = "A list of federated identity credentials to assign to the User Assigned Identity."
-    type = list(object({
-      name     = string
-      audience = list(string)
-      issuer   = string
-      subject  = string
-    }))
-    default = []
-  }
+variable "federated_identity_credentials" {
+  description = "A list of federated identity credentials to assign to the User Assigned Identity."
+  type = list(object({
+    name     = string
+    audience = list(string)
+    issuer   = string
+    subject  = string
+  }))
+  default = []
+}
