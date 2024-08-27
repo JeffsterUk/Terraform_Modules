@@ -41,10 +41,10 @@ variable "access_tier" {
   description = "Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot and Cool, defaults to Hot."
 }
 
-variable "enable_https_traffic_only" {
+variable "https_traffic_only_enabled" {
   type        = bool
   default     = true
-  description = "Boolean flag which forces HTTPS if enabled. Defaults to true."
+  description = "Boolean flag which only allows HTTPS if enabled. Defaults to true."
 }
 
 variable "hns_enabled" {

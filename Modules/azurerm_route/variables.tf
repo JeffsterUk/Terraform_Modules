@@ -13,10 +13,10 @@ variable "location" {
   description = "Specifies the supported Azure location where the resource exists."
 }
 
-variable "disable_bgp_route_propagation" {
+variable "bgp_route_propagation_enabled" {
   type        = bool
-  default     = true
-  description = "Boolean flag which controls propagation of routes learned by BGP on the Route Table. True means disabled."
+  default     = false
+  description = "Boolean flag which controls propagation of routes learned by BGP on the Route Table."
 }
 
 variable "tags" {

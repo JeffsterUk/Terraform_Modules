@@ -71,3 +71,9 @@ variable "delegation" {
   description = "Service delegation details for the subnet."
   default     = []
 }
+
+variable "private_endpoint_network_policies" {
+  type        = string
+  description = "Enable or Disable network policies for the private endpoint on the subnet. Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled. Defaults to Disabled."
+  default     = "Disabled"
+}
