@@ -138,8 +138,8 @@ stages:
           tfvarenvironment: ${{parameters.tfvarenvironment}}
           checkovSkipChecks: ${{parameters.checkovSkipChecks}}
 
-  - job: CheckovScan
-    displayName: Checkov Scan
+  - job: Infracost
+    displayName: Infracost
     dependsOn: TerraformPlan
     condition: |
       and(
