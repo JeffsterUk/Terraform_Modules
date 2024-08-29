@@ -180,7 +180,7 @@ stages:
         inputs:
           provider: azurerm
           command: show
-          commandOptions: ${{parameters.tfvarenvironment}}.tfplan
+          commandOptions: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}/${{parameters.tfvarenvironment}}.tfplan
           environmentServiceNameAzureRM: ${{ parameters.environmentServiceName }}
 
       # - script: |
