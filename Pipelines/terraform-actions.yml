@@ -159,6 +159,20 @@ stages:
           artifact: tfplan
           path: ${{ parameters.workingDirectory }}
 
+      - task: TerraformTaskV4@4
+        displayName: Convert Terraform Plan to Json
+        inputs:
+          provider: azurerm
+          command: show
+          commandOptions: ${{parameters.tfvarenvironment}}.tfplan
+          environmentServiceNameAzureRM: ${{ parameters.environmentServiceName }}
+
+      # - script: |
+      #     cd $(Build.SourcesDirectory)/${{ variables.SourceRepositoryName }}/${{ variables.SourceRepositoryName }}/env
+      #     terraform show -no-color tf.tfplan > $(Agent.TempDirectory)/tf.txt
+      #   displayName: Convert Terraform plan to text
+
+
 - stage: Apply
   displayName: Terraform-Apply
   condition: | 
