@@ -26,6 +26,6 @@ steps:
       workingDirectory: ${{ parameters.workingDirectory }}
       commandOptions: '-out=${{ parameters.tfvarenvironment }}.tfplan -input=false --var-file="${{ parameters.workingDirectory }}/${{ parameters.tfvarenvironment }}.tfvars"'
 
-  - publish: "${{ parameters.workingDirectory }}/${{ parameters.tfvarenvironment }}.tfplan"
+  - publish: ${{ parameters.workingDirectory }}
     displayName: "Publish Terraform plan"
     artifact: tfplan

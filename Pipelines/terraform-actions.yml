@@ -146,6 +146,9 @@ stages:
         succeeded(), 
         ne(variables['Build.Reason'], 'Schedule')
       )
+
+    checkout: none
+
     steps:
       - task: InfracostSetup@2
         displayName: Setup Infracost
