@@ -157,7 +157,9 @@ stages:
         displayName: "Download terraform plan."
         inputs:
           artifact: tfplan
-          path: ${{ parameters.workingDirectory }}
+          path: $(System.DefaultWorkingDirectory)
+
+      - script: ls
 
       - task: TerraformTaskV4@4
         displayName: Convert Terraform Plan to Json
