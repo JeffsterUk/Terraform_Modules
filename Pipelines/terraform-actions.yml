@@ -161,12 +161,12 @@ stages:
               inputs:
                 terraformVersion: 'latest'
 
-            - task: InstallSSHKey@0
-              inputs:
-                knownHostsEntry: $(known_host_entry)
-                sshPublicKey: $(ssh_public_key)
-                sshPassphrase: $(ssh_pass_phrase)
-                sshKeySecureFile: $(ssh_key_secure_file)
+            # - task: InstallSSHKey@0
+            #   inputs:
+            #     knownHostsEntry: $(known_host_entry)
+            #     sshPublicKey: $(ssh_public_key)
+            #     sshPassphrase: $(ssh_pass_phrase)
+            #     sshKeySecureFile: $(ssh_key_secure_file)
 
             - template: common/terraform-init.yml
               parameters:

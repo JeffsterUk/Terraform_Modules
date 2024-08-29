@@ -43,12 +43,12 @@ steps:
       fi
     displayName: 'Check and install Docker'
 
-  - task: InstallSSHKey@0
-    inputs:
-      knownHostsEntry: $(known_host_entry)
-      sshPublicKey: $(ssh_public_key)
-      sshPassphrase: $(ssh_pass_phrase)
-      sshKeySecureFile: $(ssh_key_secure_file)
+  # - task: InstallSSHKey@0
+  #   inputs:
+  #     knownHostsEntry: $(known_host_entry)
+  #     sshPublicKey: $(ssh_public_key)
+  #     sshPassphrase: $(ssh_pass_phrase)
+  #     sshKeySecureFile: $(ssh_key_secure_file)
 
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
     inputs:
