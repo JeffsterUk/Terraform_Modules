@@ -159,7 +159,7 @@ stages:
       - task: DownloadPipelineArtifact@2
         displayName: "Download Terraform Artifacts."
         inputs:
-          artifact: tfplan
+          artifact: ${{ parameters.tfvarenvironment }}
           path: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
 
       - script: ls -la
