@@ -28,4 +28,4 @@ steps:
 
   - publish: ${{ parameters.workingDirectory }}
     displayName: "Publish Terraform plan"
-    artifact: ${{ parameters.workingDirectory }}
+    artifact: ${{ parameters.tfvarenvironment }}
