@@ -159,7 +159,19 @@ stages:
           artifact: tfplan
           path: $(System.DefaultWorkingDirectory)
 
-      - script: ls
+
+      - template: common/terraform-init.yml
+        parameters:
+          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+          backendServiceArm: ${{ parameters.backendServiceArm }}
+          backendAzureRmSubscriptionId: ${{ parameters.backendAzureRmSubscriptionId }}
+          backendAzureRmResourceGroupName: ${{ parameters.backendAzureRmResourceGroupName }}
+          backendAzureRmStorageAccountName: ${{ parameters.backendAzureRmStorageAccountName }}
+          backendAzureRmContainerName: ${{ parameters.backendAzureRmContainerName }}
+          backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
+          allowTelemetryCollection: false
+
+      - script: ls -la
 
       - task: TerraformTaskV4@4
         displayName: Convert Terraform Plan to Json
