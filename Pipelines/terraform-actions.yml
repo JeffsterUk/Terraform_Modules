@@ -1,0 +1,187 @@
+---
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: backendServiceArm
+    type: string
+  - name: backendAzureRmSubscriptionId
+    type: string
+  - name: backendAzureRmResourceGroupName
+    type: string
+  - name: backendAzureRmStorageAccountName
+    type: string
+  - name: backendAzureRmContainerName
+    type: string
+  - name: backendAzureRmKey
+    type: string
+  - name: environment
+    type: string
+  - name: environmentServiceName
+    type: string
+  - name: pool
+    type: string
+  - name: allowTelemetryCollection
+    type: boolean
+    default: false
+  - name: tfvarenvironment
+    type: string
+  - name: workItemTeamProject
+    type: string
+  - name: workItemIterationPath
+    type: string
+  - name: workItemType
+    type: string
+  - name: workItemTitle
+    type: string
+  - name: workItemDescription
+    type: string
+  - name: workItemUpdateComment
+    type: string
+  - name: workItemTags
+    type: string
+  - name: workItemParentId
+    type: number
+  - name: runWorkItemCreationTask
+    type: boolean
+    default: false
+  - name: runCheckovStage
+    type: boolean
+    default: true
+  - name: checkovSkipChecks
+    type: string
+
+
+stages:
+- stage: Build
+  pool:
+    name: ${{ parameters.pool }}
+  condition: always()
+  displayName: Terraform-Plan
+  jobs:
+  - job: TerraformPlan
+    displayName: Terraform Plan
+    steps:
+
+    - task: InstallSSHKey@0
+      inputs:
+        knownHostsEntry: $(known_host_entry)
+        sshPublicKey: $(ssh_public_key)
+        sshPassphrase: $(ssh_pass_phrase)
+        sshKeySecureFile: $(ssh_key_secure_file)
+
+    - checkout: self
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+      inputs:
+        terraformVersion: 'latest'
+
+    - template: common/terraform-init.yml
+      parameters:
+        workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+        backendServiceArm: ${{ parameters.backendServiceArm }}
+        backendAzureRmSubscriptionId: ${{ parameters.backendAzureRmSubscriptionId }}
+        backendAzureRmResourceGroupName: ${{ parameters.backendAzureRmResourceGroupName }}
+        backendAzureRmStorageAccountName: ${{ parameters.backendAzureRmStorageAccountName }}
+        backendAzureRmContainerName: ${{ parameters.backendAzureRmContainerName }}
+        backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
+        allowTelemetryCollection: false
+
+    - template: common/terraform-plan.yml
+      parameters:
+        workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+        environmentServiceName: ${{ parameters.environmentServiceName }}
+        allowTelemetryCollection: false
+        tfvarenvironment: ${{parameters.tfvarenvironment}}
+
+  - job: CreateWorkItem
+    displayName: Create Work Item
+    dependsOn: TerraformPlan
+    condition: |
+      and(
+        succeeded(), 
+        eq(${{ parameters.runWorkItemCreationTask }}, true),
+        eq(variables['Build.Reason'], 'Schedule'),
+        eq(dependencies.TerraformPlan.outputs['TERRAFORMTASKV43.CHANGESPRESENT'], 'true')
+      )
+    steps:
+    - template: common/create-work-item.yml
+      parameters:
+        workItemTeamProject: ${{ parameters.workItemTeamProject }}
+        workItemIterationPath: ${{ parameters.workItemIterationPath }}
+        workItemType: ${{ parameters.workItemType }}
+        workItemTitle: ${{ parameters.workItemTitle }}
+        workItemDescription: ${{ parameters.workItemDescription }}
+        workItemUpdateComment: ${{ parameters.workItemUpdateComment }}
+        workItemTags: ${{ parameters.workItemTags }}
+        workItemParentId: ${{ parameters.workItemParentId }}
+
+  - job: CheckovScan
+    displayName: Checkov Scan
+    dependsOn: TerraformPlan
+    condition: |
+      and(
+        succeeded(), 
+        eq(${{ parameters.runCheckovStage }}, true),
+        ne(variables['Build.Reason'], 'Schedule')
+      )
+    steps:
+      - template: common/checkov.yml
+        parameters:
+          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+          backendServiceArm: ${{ parameters.backendServiceArm }}
+          backendAzureRmSubscriptionId: ${{ parameters.backendAzureRmSubscriptionId }}
+          backendAzureRmResourceGroupName: ${{ parameters.backendAzureRmResourceGroupName }}
+          backendAzureRmStorageAccountName: ${{ parameters.backendAzureRmStorageAccountName }}
+          backendAzureRmContainerName: ${{ parameters.backendAzureRmContainerName }}
+          backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
+          tfvarenvironment: ${{parameters.tfvarenvironment}}
+          checkovSkipChecks: ${{parameters.checkovSkipChecks}}
+
+- stage: Apply
+  displayName: Terraform-Apply
+  condition: | 
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/releases/baseline'),
+      eq(stageDependencies.Build.outputs['TerraformPlan.TERRAFORMTASKV43.CHANGESPRESENT'], 'true'),
+      ne(variables['Build.Reason'], 'Schedule')
+    )
+  jobs:
+  - deployment: TerraformApply
+    displayName: Terraform-Apply
+    timeoutInMinutes: 180
+    pool:
+      name: ${{ parameters.pool }}
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+            - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+              inputs:
+                terraformVersion: 'latest'
+
+            - task: InstallSSHKey@0
+              inputs:
+                knownHostsEntry: $(known_host_entry)
+                sshPublicKey: $(ssh_public_key)
+                sshPassphrase: $(ssh_pass_phrase)
+                sshKeySecureFile: $(ssh_key_secure_file)
+
+            - template: common/terraform-init.yml
+              parameters:
+                workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+                backendServiceArm: ${{ parameters.backendServiceArm }}
+                backendAzureRmSubscriptionId: ${{ parameters.backendAzureRmSubscriptionId }}
+                backendAzureRmResourceGroupName: ${{ parameters.backendAzureRmResourceGroupName }}
+                backendAzureRmStorageAccountName: ${{ parameters.backendAzureRmStorageAccountName }}
+                backendAzureRmContainerName: ${{ parameters.backendAzureRmContainerName }}
+                backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
+                allowTelemetryCollection: false
+
+            - template: common/terraform-apply.yml
+              parameters:
+                workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+                environmentServiceName: ${{ parameters.environmentServiceName }}
+                allowTelemetryCollection: false
+                tfvarenvironment: ${{parameters.tfvarenvironment}}

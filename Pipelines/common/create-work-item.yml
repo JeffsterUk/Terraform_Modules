@@ -1,0 +1,47 @@
+---
+parameters:
+  - name: workItemTeamProject
+    type: string
+  - name: workItemIterationPath
+    type: string
+  - name: workItemType
+    type: string
+  - name: workItemTitle
+    type: string
+  - name: workItemDescription
+    type: string
+  - name: workItemUpdateComment
+    type: string
+  - name: workItemTags
+    type: string
+  - name: workItemParentId
+    type: number
+
+
+steps:
+  - task: CreateWorkItem@2
+    displayName: "Create Work Item"
+    inputs:
+      teamProject: ${{ parameters.workItemTeamProject }}
+      workItemType: ${{ parameters.workItemType }}
+      title: ${{ parameters.workItemTitle }}
+      areaPath: ${{ parameters.workItemTeamProject }}
+      iterationPath: ${{ parameters.workItemIterationPath }}
+      fieldMappings: |
+        System.Description=${{ parameters.workItemDescription }}
+        System.Tags=${{ parameters.workItemTags }}
+      associate: true
+      # ===== Linking Inputs =====
+      linkWorkItems: true
+      linkType: "System.LinkTypes.Hierarchy-Reverse"
+      linkTarget: "id"
+      targetId: ${{ parameters.workItemParentId }}
+      # ===== Duplicate Inputs =====.
+      preventDuplicates: true
+      keyFields: |
+        System.Title
+        System.AreaPath
+        System.State==[New, Active]
+      updateDuplicates: true
+      updateRules: |
+        System.History=${{ parameters.workItemUpdateComment }}

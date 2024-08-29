@@ -1,0 +1,35 @@
+---
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: backendServiceArm
+    type: string
+  - name: backendAzureRmSubscriptionId
+    type: string
+  - name: backendAzureRmResourceGroupName
+    type: string
+  - name: backendAzureRmStorageAccountName
+    type: string
+  - name: backendAzureRmContainerName
+    type: string
+  - name: backendAzureRmKey
+    type: string
+  - name: allowTelemetryCollection
+    type: boolean
+    default: false
+
+steps:
+  - task: TerraformTaskV4@4
+    displayName: Terraform-Init
+    inputs:
+      command: 'init'
+      commandOptions: -reconfigure -input=false
+      workingDirectory: ${{ parameters.workingDirectory }}
+      backendType: 'azurerm'
+      backendServiceArm: ${{ parameters.backendServiceArm }}
+      backendAzureRmSubscriptionId: ${{ parameters.backendAzureRmSubscriptionId }}
+      backendAzureRmResourceGroupName: ${{ parameters.backendAzureRmResourceGroupName }}
+      backendAzureRmStorageAccountName: ${{ parameters.backendAzureRmStorageAccountName }}
+      backendAzureRmContainerName: ${{ parameters.backendAzureRmContainerName }}
+      backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
+      allowTelemetryCollection: ${{ parameters.allowTelemetryCollection }}

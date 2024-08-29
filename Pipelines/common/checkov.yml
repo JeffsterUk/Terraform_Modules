@@ -1,0 +1,109 @@
+---
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: backendServiceArm
+    type: string
+  - name: backendAzureRmResourceGroupName
+    type: string
+  - name: backendAzureRmStorageAccountName
+    type: string
+  - name: backendAzureRmContainerName
+    type: string
+  - name: backendAzureRmSubscriptionId
+    type: string
+  - name: backendAzureRmKey
+    type: string
+  - name: tfvarenvironment
+    type: string
+    displayName: The environment to build. Note that this will be the state file name and tfvars.
+  - name: checkovSkipChecks
+    type: string
+
+steps:
+  - script: 
+      sudo apt install git -y
+    displayName: 'git installation'
+
+  - script: 
+      sudo apt update -y
+    displayName: 'Update package reference'
+
+  - script: |
+      if ! [[ $(which zip) ]]; then
+        echo "Zip not installed"
+        sudo apt install zip -y
+      fi
+    displayName: 'Check and install Zip'
+
+  - script: 
+      if ! [[ $(which docker) && $(docker --version) ]]; then
+        sudo snap install docker;
+        sudo snap restart docker;
+      fi
+    displayName: 'Check and install Docker'
+
+  - task: InstallSSHKey@0
+    inputs:
+      knownHostsEntry: $(known_host_entry)
+      sshPublicKey: $(ssh_public_key)
+      sshPassphrase: $(ssh_pass_phrase)
+      sshKeySecureFile: $(ssh_key_secure_file)
+
+  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+    inputs:
+      terraformVersion: 'latest'
+
+  - template: terraform-init.yml
+    parameters:
+      workingDirectory: ${{ parameters.workingDirectory }}
+      backendServiceArm: ${{ parameters.backendServiceArm }}
+      backendAzureRmSubscriptionId: ${{ parameters.backendAzureRmSubscriptionId }}
+      backendAzureRmResourceGroupName: ${{ parameters.backendAzureRmResourceGroupName }}
+      backendAzureRmStorageAccountName: ${{ parameters.backendAzureRmStorageAccountName }}
+      backendAzureRmContainerName: ${{ parameters.backendAzureRmContainerName }}
+      backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
+      allowTelemetryCollection: false
+
+  - task: DownloadPipelineArtifact@2
+    displayName: "Download terraform plan."
+    inputs:
+      artifact: tfplan
+      path: ${{ parameters.workingDirectory }}
+
+  - script: |
+      sudo mkdir -p ~/plantojson
+      sudo chmod 777 ~/plantojson
+      sudo ls -ltr ~/plantojson
+      terraform show -no-color -json ${{ parameters.tfvarenvironment }}.tfplan > ~/plantojson/tfplan.json
+      sudo chmod 777 ~/plantojson/tfplan.json
+      sudo ls -ltr ~/plantojson
+    displayName: Convert Terraform plan to json
+    workingDirectory: "${{ parameters.workingDirectory }}"
+
+  - script: |  
+      sudo docker pull bridgecrew/checkov
+      sudo docker run --privileged --rm --volume ~/plantojson:/Terraform --workdir /Terraform bridgecrew/checkov -f tfplan.json --output junitxml --skip-check ${{ parameters.checkovSkipChecks }} --skip-download --soft-fail > $(System.DefaultWorkingDirectory)/report.xml
+      cat ~/plantojson/tfplan.json
+      cat $(System.DefaultWorkingDirectory)/report.xml
+    displayName: 'Terraform static code analysis'
+    condition: 'succeededOrFailed()'
+    workingDirectory: "${{ parameters.workingDirectory }}"
+
+  - task: PublishTestResults@2
+    displayName: 'Publish results'
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/report.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      testRunTitle: 'Checkov Scan'
+      publishRunAttachments: true
+      failTaskOnFailedTests: false
+
+  - script: |       
+      sudo rm -R ~/plantojson
+      sudo docker container prune --force
+    displayName: 'Clean environment'
+    condition: 'succeededOrFailed()'
+    workingDirectory: "${{ parameters.workingDirectory }}"

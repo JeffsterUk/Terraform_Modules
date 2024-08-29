@@ -24,6 +24,9 @@ variable "role_assignments" {
   type = map(object({
     scope_id             = string
     role_definition_name = string
+    condition            = string
+    condition_version    = string
+    principal_type       = string
   }))
   default = {}
 }

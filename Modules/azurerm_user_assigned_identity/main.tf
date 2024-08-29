@@ -17,6 +17,9 @@ resource "azurerm_role_assignment" "this" {
   scope                = each.value.scope_id
   role_definition_name = each.value.role_definition_name
   principal_id         = azurerm_user_assigned_identity.this.principal_id
+  condition            = each.value.condition
+  condition_version    = each.value.condition_version
+  principal_type       = each.value.principal_type
   lifecycle {
     ignore_changes = [scope]
   }

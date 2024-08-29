@@ -1,0 +1,30 @@
+---
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: environmentServiceName
+    type: string
+  - name: allowTelemetryCollection
+    type: boolean
+    default: false
+  - name: tfvarenvironment
+    type: string
+    displayName: The environment to build. Note that this will be the state file name and tfvars.
+
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: "Download terraform plan."
+    inputs:
+      artifact: tfplan
+      path: ${{ parameters.workingDirectory }}
+
+  - task: TerraformTaskV4@4
+    displayName: Terraform-Apply
+    timeoutInMinutes: 180
+    inputs:
+      command: 'apply'
+      environmentServiceNameAzureRM: ${{ parameters.environmentServiceName }}
+      workingDirectory: ${{ parameters.workingDirectory }}
+      commandOptions: "-auto-approve -compact-warnings -input=false ${{ parameters.tfvarenvironment }}.tfplan"
+      allowTelemetryCollection: ${{ parameters.allowTelemetryCollection }}

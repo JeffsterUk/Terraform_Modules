@@ -1,0 +1,31 @@
+---
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: environmentServiceName
+    type: string
+  - name: allowTelemetryCollection
+    type: boolean
+    default: false
+  - name: tfvarenvironment
+    type: string
+    displayName: The environment to build. Note that this will be the state file name and tfvars.
+
+steps:
+  - task: TerraformTaskV4@4
+    displayName: Terraform-Validation
+    inputs:
+      command: validate
+      workingDirectory: ${{ parameters.workingDirectory }}
+
+  - task: TerraformTaskV4@4
+    displayName: Terraform-Plan
+    inputs:
+      command: 'plan'
+      environmentServiceNameAzureRM: ${{ parameters.environmentServiceName }}
+      workingDirectory: ${{ parameters.workingDirectory }}
+      commandOptions: '-out=${{ parameters.tfvarenvironment }}.tfplan -input=false --var-file="${{ parameters.workingDirectory }}/${{ parameters.tfvarenvironment }}.tfvars"'
+
+  - publish: "${{ parameters.workingDirectory }}/${{ parameters.tfvarenvironment }}.tfplan"
+    displayName: "Publish Terraform plan"
+    artifact: tfplan
