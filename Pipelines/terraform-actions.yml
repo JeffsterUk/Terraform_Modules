@@ -148,7 +148,7 @@ stages:
       )
 
     steps:
-      - checkout: none
+      - checkout: Jeffster_Uk
       
       - task: InfracostSetup@2
         displayName: Setup Infracost
@@ -157,12 +157,12 @@ stages:
           currency: 'GBP'
 
       - task: DownloadPipelineArtifact@2
-        displayName: "Download Terraform Artifacts."
+        displayName: "Download Target Terraform Artifacts."
         inputs:
           artifact: ${{ parameters.tfvarenvironment }}
-          path: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
+          path: $(System.DefaultWorkingDirectory)/Target/${{ parameters.workingDirectory }}
 
-      - script: ls -la
+      - script: ls -la -R
 
       - template: common/terraform-init.yml
         parameters:
@@ -199,11 +199,6 @@ stages:
 
 
 
-
-      # - script: |
-      #     cd $(Build.SourcesDirectory)/${{ variables.SourceRepositoryName }}/${{ variables.SourceRepositoryName }}/env
-      #     terraform show -no-color tf.tfplan > $(Agent.TempDirectory)/tf.txt
-      #   displayName: Convert Terraform plan to text
 
 
 - stage: Apply
