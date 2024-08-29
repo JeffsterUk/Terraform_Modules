@@ -176,6 +176,12 @@ stages:
           allowTelemetryCollection: false
 
       - task: TerraformTaskV4@4
+        displayName: Terraform-Validation
+        inputs:
+          command: validate
+          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}'
+
+      - task: TerraformTaskV4@4
         displayName: Convert Terraform Plan to Json
         inputs:
           provider: azurerm
@@ -183,6 +189,16 @@ stages:
           commandOptions: -no-color ${{parameters.tfvarenvironment}}.tfplan
           environmentServiceNameAzureRM: ${{ parameters.environmentServiceName }}
           workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
+
+
+
+
+
+
+
+
+
+
 
       # - script: |
       #     cd $(Build.SourcesDirectory)/${{ variables.SourceRepositoryName }}/${{ variables.SourceRepositoryName }}/env
