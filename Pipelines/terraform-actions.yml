@@ -160,7 +160,7 @@ stages:
         displayName: "Download Terraform Artifacts."
         inputs:
           artifact: tfplan
-          path: $(System.DefaultWorkingDirectory)
+          path: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
 
       - script: ls -la
 
