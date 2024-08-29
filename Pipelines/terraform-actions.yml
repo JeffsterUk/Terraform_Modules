@@ -72,24 +72,6 @@ stages:
     #     sshPassphrase: $(ssh_pass_phrase)
     #     sshKeySecureFile: $(ssh_key_secure_file)
 
-    - task: InfracostSetup@2
-      displayName: Setup Infracost
-      inputs:
-        apiKey: ${{ parameters.infracostApiKey }}
-        currency: 'GBP'
-
-    - bash: |
-        branch=$(System.PullRequest.SourceBranch)
-        git fetch origin $branch
-        git checkout ${branch#refs/heads/}
-      displayName: Checkout target branch
-
-    - bash: |
-        infracost breakdown --path=$(Agent.BuildDirectory) \
-                            --format=json \
-                            --out-file=$(Agent.TempDirectory)/infracost-base.json
-      displayName: Generate Infracost cost estimate baseline
-
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
       inputs:
         terraformVersion: 'latest'
@@ -155,6 +137,27 @@ stages:
           backendAzureRmKey: ${{ parameters.backendAzureRmKey }}
           tfvarenvironment: ${{parameters.tfvarenvironment}}
           checkovSkipChecks: ${{parameters.checkovSkipChecks}}
+
+  - job: CheckovScan
+    displayName: Checkov Scan
+    dependsOn: TerraformPlan
+    condition: |
+      and(
+        succeeded(), 
+        ne(variables['Build.Reason'], 'Schedule')
+      )
+    steps:
+      - task: InfracostSetup@2
+        displayName: Setup Infracost
+        inputs:
+          apiKey: ${{ parameters.infracostApiKey }}
+          currency: 'GBP'
+
+      - task: DownloadPipelineArtifact@2
+        displayName: "Download terraform plan."
+        inputs:
+          artifact: tfplan
+          path: ${{ parameters.workingDirectory }}
 
 - stage: Apply
   displayName: Terraform-Apply
