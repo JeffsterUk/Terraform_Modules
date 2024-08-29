@@ -180,8 +180,9 @@ stages:
         inputs:
           provider: azurerm
           command: show
-          commandOptions: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}/${{parameters.tfvarenvironment}}.tfplan
+          commandOptions: -no-color ${{parameters.tfvarenvironment}}.tfplan
           environmentServiceNameAzureRM: ${{ parameters.environmentServiceName }}
+          workingDirectory: ${{ parameters.workingDirectory }}
 
       # - script: |
       #     cd $(Build.SourcesDirectory)/${{ variables.SourceRepositoryName }}/${{ variables.SourceRepositoryName }}/env
