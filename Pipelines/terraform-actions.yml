@@ -25,6 +25,8 @@ parameters:
     default: false
   - name: tfvarenvironment
     type: string
+  - name: infracostApiKey
+    type: string
   - name: workItemTeamProject
     type: string
   - name: workItemIterationPath
@@ -61,6 +63,7 @@ stages:
   - job: TerraformPlan
     displayName: Terraform Plan
     steps:
+    - checkout: self
 
     # - task: InstallSSHKey@0
     #   inputs:
@@ -69,7 +72,24 @@ stages:
     #     sshPassphrase: $(ssh_pass_phrase)
     #     sshKeySecureFile: $(ssh_key_secure_file)
 
-    - checkout: self
+    - task: InfracostSetup@2
+      displayName: Setup Infracost
+      inputs:
+        apiKey: ${{ parameters.infracostApiKey }}
+        currency: 'GBP'
+
+    - bash: |
+        branch=$(System.PullRequest.SourceBranch)
+        git fetch origin $branch
+        git checkout ${branch#refs/heads/}
+      displayName: Checkout target branch
+
+    - bash: |
+        infracost breakdown --path=$(Agent.BuildDirectory) \
+                            --format=json \
+                            --out-file=$(Agent.TempDirectory)/infracost-base.json
+      displayName: Generate Infracost cost estimate baseline
+
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
       inputs:
         terraformVersion: 'latest'
