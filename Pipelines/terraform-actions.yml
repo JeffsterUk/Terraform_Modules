@@ -62,12 +62,12 @@ stages:
     displayName: Terraform Plan
     steps:
 
-    - task: InstallSSHKey@0
-      inputs:
-        knownHostsEntry: $(known_host_entry)
-        sshPublicKey: $(ssh_public_key)
-        sshPassphrase: $(ssh_pass_phrase)
-        sshKeySecureFile: $(ssh_key_secure_file)
+    # - task: InstallSSHKey@0
+    #   inputs:
+    #     knownHostsEntry: $(known_host_entry)
+    #     sshPublicKey: $(ssh_public_key)
+    #     sshPassphrase: $(ssh_pass_phrase)
+    #     sshKeySecureFile: $(ssh_key_secure_file)
 
     - checkout: self
     - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
