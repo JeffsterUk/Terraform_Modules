@@ -147,9 +147,9 @@ stages:
         ne(variables['Build.Reason'], 'Schedule')
       )
 
-    checkout: none
-
     steps:
+      - checkout: none
+      
       - task: InfracostSetup@2
         displayName: Setup Infracost
         inputs:
