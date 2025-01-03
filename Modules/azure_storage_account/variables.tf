@@ -118,3 +118,17 @@ variable "tags" {
   description = "A mapping of tags to assign to the resource."
   default     = {}
 }
+
+variable "static_website" {
+  description = "Enable static website hosting"
+  type        = object({
+    enable            = bool
+    index_document     = string
+    error_404_document = string
+  })
+  default     = {
+    enable            = false
+    index_document     = "index.html"
+    error_404_document = "404.html"
+  }
+}

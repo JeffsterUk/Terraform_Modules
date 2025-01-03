@@ -2,8 +2,6 @@ variable "network_interfaces" {
   type = list(object({
     name                          = string
     dns_servers                   = list(string)
-    enable_ip_forwarding          = bool
-    enable_accelerated_networking = bool
     internal_dns_name_label       = string
 
     ip_configuration = list(object({

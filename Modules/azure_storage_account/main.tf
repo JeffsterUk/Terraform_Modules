@@ -19,7 +19,15 @@ resource "azurerm_storage_account" "this" {
   allow_nested_items_to_be_public = var.allow_nested_items_to_be_public
   public_network_access_enabled   = var.public_network_access_enabled
 
-  dynamic "network_rules" {
+  dynamic "static_website" {
+    for_each = var.static_website.enable ? [1] : []
+    content {
+      index_document     = var.static_website.index_document
+      error_404_document = var.static_website.error_404_document
+    }
+  }
+
+    dynamic "network_rules" {
     for_each = var.network_rules != null ? [var.network_rules] : []
     content {
       default_action = network_rules.value.default_action

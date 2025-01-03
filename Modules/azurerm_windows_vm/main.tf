@@ -23,8 +23,6 @@ resource "azurerm_network_interface" "nic" {
   location                      = var.location
   resource_group_name           = var.resource_group_name
   dns_servers                   = each.value.dns_servers
-  enable_ip_forwarding          = each.value.enable_ip_forwarding
-  enable_accelerated_networking = each.value.enable_accelerated_networking
   internal_dns_name_label       = each.value.internal_dns_name_label
   tags                          = var.tags
 
@@ -74,6 +72,8 @@ resource "azurerm_windows_virtual_machine" "vm" {
   timezone                     = var.timezone
   virtual_machine_scale_set_id = var.virtual_machine_scale_set_id
   zone                         = var.zone
+  vm_agent_platform_updates_enabled = false
+  bypass_platform_safety_checks_on_user_schedule_enabled = true
 
   os_disk {
     caching                   = var.os_disk_caching
